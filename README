@@ -1,0 +1,15 @@
+smart twitter client inspired by @hmason's twitter client https://github.com/hmason/tc
+
+SERIOUS WIP
+
+$ source rc.sh
+$ ./main.rb
+
+uses https://github.com/jnunemaker/twitter for twitter access
+
+for timeline api
+https://github.com/jnunemaker/twitter/blob/master/lib/twitter/client/timeline.rb
+
+mongo db ruby api
+http://api.mongodb.org/ruby/1.1.2/index.html
+
