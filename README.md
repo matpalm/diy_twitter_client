@@ -72,13 +72,19 @@ eg 'uuudn' means you liked the first 3, didn't like the 4th and were neutral on 
 
 (i know it's a crap interface but it'll do for now)
 
+### part four: the actual learning
+
+this is the next thing to do!
+
 ## TODOs semi prioritised...
+- hook up something dead simple for classification; even word occurences to start with
+- hook up semi supervised version
+- work out best way to hook the classified as to-read ones higher into the ./read_tweets queue
+- work out how to have the author of highly rated tweets have their friends more likely to be added to the crawl 
 - use since_id in ./fetch_new_tweets.rb to avoid getting same tweets again and again
 - make crawl queue smarter, just round robin at the moment...
 - add something to read_tweets.rb that dereferences bitly links
 - decide on a feature breakdown; 1 feature per token, if_reply, has_link, has_at_references, num terms
-- hook up something dead simple for classification; even word occurences to start with
-- hook up semi supervised version
 - replace dead simple classifier with redis backed multinomial bayes
 
 ## NOTES TO SELF
