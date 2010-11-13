@@ -79,7 +79,6 @@ class Tweets
   def check_and_store_if_new tweets    
     unseen_tweets = tweets.select { |t| ! have_tweet? t['id'] }
     unseen_tweets.each do |t|
-      t['read'] = false
       @mongo.insert(t) 
     end
     unseen_tweets

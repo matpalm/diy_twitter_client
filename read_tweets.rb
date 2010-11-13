@@ -12,9 +12,9 @@ while true do
   end
 
   tweets.each_with_index do |t, idx|
-    id, text, read  = %w(id text read).map{|k| t[k]}
+    id, text  = %w(id text).map{|k| t[k]}
     screen_name = t['user']['name']
-    puts [idx, id, read, screen_name, text].join("\t")
+    puts [idx, id, screen_name, text].join("\t")
   end
 
   idx = 0
