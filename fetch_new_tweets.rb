@@ -5,9 +5,6 @@ require 'tweets'
 @crawl_queue = CrawlQueue.new 
 @twitter = Tweets.new
 
-# seed if required
-# %w(dfgdjgdfg).each { |u| @crawl_queue.push(u) }
-
 def fetch_next
   # peek next
   uid = @crawl_queue.peek
