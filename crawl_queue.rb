@@ -12,34 +12,38 @@ class CrawlQueue
 
 =begin too dangerous!
   def clear
-    @r.zremrangebyrank Q, 0, queue_size
+    @r.zremrangebyrank CRAWL_QUEUE, 0, queue_size
   end
 =end
 
-  def contains? uid
-    ! @r.zrank(Q, uid).nil?
+  def contains? screen_name
+    ! @r.zrank(CRAWL_QUEUE, screen_name).nil?
   end
 
-  def push uid
-    @r.zadd Q, Time.now.to_f, uid
+  def push screen_name
+    @r.zadd CRAWL_QUEUE, Time.now.to_f, screen_name 
   end
 
-  def remove uid
-    @r.zrem Q, uid
+  def push_front screen_name
+    @r.zadd CRAWL_QUEUE, 1.0, screen_name
+  end
+
+  def remove screen_name
+    @r.zrem CRAWL_QUEUE, screen_name
   end
 
   def peek
-    @r.zrange(Q,0,0).first
+    @r.zrange(CRAWL_QUEUE,0,0).first
   end
 
   def queue_size
-    @r.zcard Q
+    @r.zcard CRAWL_QUEUE
   end
 
   def dump_queue
-    uids = @r.zrange Q, 0, queue_size
-    scores = uids.map { |uid| @r.zscore(Q,uid) }
-    uids.zip(scores).each { |us| puts us.inspect }
+    screen_names = @r.zrange CRAWL_QUEUE, 0, queue_size
+    scores = screen_names.map { |screen_name| @r.zscore(CRAWL_QUEUE,screen_name) }
+    screen_names.zip(scores).each { |us| puts us.inspect }
   end
 
 end

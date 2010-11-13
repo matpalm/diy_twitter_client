@@ -12,7 +12,8 @@ class Tweets
 
     mongo = Mongo::Connection.new
     db = mongo.db 'tweets'
-    @mongo = db['tweets']
+    @tweets = db['tweets']
+    @users = db['users']
 
     @redis = Redis.new
     @redis.select TWEET_DB
@@ -21,16 +22,34 @@ class Tweets
   def client
     @twitter
   end
-  
-  def fetch_latest_for opts
-    tweets = get_tweets opts
+
+  def user_info_for uid
+    mongo_lookup_key = uid.is_a?(String) ? 'screen_name' : 'id'
+    user_info = @users.find_one(mongo_lookup_key => uid)
+    return user_info if user_info
+    user_info = @twitter.user(uid).to_hash    
+    @users.save user_info
+    user_info
+  end
+
+  def friends_of uid
+    user_info = user_info_for uid
+    return user_info['friends'] if user_info.has_key? 'friends'
+    friends = @twitter.friend_ids(uid) rescue []
+    user_info['friends'] = friends
+    @users.save user_info
+    friends
+  end
+
+  def fetch_latest_tweets_for uid
+    tweets = get_tweets_for uid
     new_tweets = check_and_store_if_new tweets
-    puts "num_fetched=#{tweets.size} num_new=#{new_tweets.size} num_total=#{@mongo.size}"
+    puts "num_fetched=#{tweets.size} num_new=#{new_tweets.size} num_total=#{@tweets.size}"
     new_tweets
   end
 
   def get_latest_unread n=10
-    @mongo.find({ :thumbs => { "$exists" => false }}).limit(n).sort(['id','descending']).to_a
+    @tweets.find({ :thumbs => { "$exists" => false }}).limit(n).sort(['id','descending']).to_a
   end
 
   def mark_thumbs_up tweet
@@ -49,10 +68,10 @@ class Tweets
     # todo use group by, too lazy...
     {
       :thumbs => { 
-        :up        => @mongo.find({ :thumbs => 'up' }).count,
-        :neutral   => @mongo.find({ :thumbs => 'neutral' }).count,
-        :down      => @mongo.find({ :thumbs => 'down' }).count,
-        :undecided => @mongo.find({ :thumbs => { "$exists" => false }}).count
+        :up        => @tweets.find({ :thumbs => 'up' }).count,
+        :neutral   => @tweets.find({ :thumbs => 'neutral' }).count,
+        :down      => @tweets.find({ :thumbs => 'down' }).count,
+        :undecided => @tweets.find({ :thumbs => { "$exists" => false }}).count
       }
     }
   end
@@ -61,25 +80,23 @@ class Tweets
 
   def mark mark, tweet
     tweet['thumbs'] = mark
-    @mongo.save tweet
+    @tweets.save tweet
   end
 
-  def get_tweets opts
-    raise "need :uid in opts" unless opts[:uid]
-    uid = opts.delete :uid
-    opts.merge!({ :include_entities=>true, :count => 10 })
-    tweets = @twitter.user_timeline(uid,  opts)
+  def get_tweets_for uid
+    opts = { :include_entities=>true, :count => 10 }
+    tweets = @twitter.user_timeline(uid, opts)
     tweets.map(&:to_hash)
   end
 
   def have_tweet? id
-    @mongo.find({:id => id}).count != 0
+    @tweets.find({:id => id}).count != 0
   end
 
   def check_and_store_if_new tweets    
     unseen_tweets = tweets.select { |t| ! have_tweet? t['id'] }
     unseen_tweets.each do |t|
-      @mongo.insert(t) 
+      @tweets.insert(t) 
     end
     unseen_tweets
   end

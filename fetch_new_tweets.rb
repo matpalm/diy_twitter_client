@@ -11,7 +11,7 @@ def fetch_next
   puts "next is #{uid}"
   
   # fetch tweets for users
-  tweets = @twitter.fetch_latest_for :uid => uid
+  tweets = @twitter.fetch_latest_tweets_for uid
   tweets.each do |tweet|
     puts "#{uid}\t#{tweet['id']}\t#{tweet['text']}"  
   end

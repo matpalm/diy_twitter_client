@@ -18,24 +18,60 @@ $ source rc.sh
 # start mongo and redis
 $ ./start_mongod_and_redis.sh
 
-# add some followers to the queue
-$ ./add_users_to_follow.rb mat_kelcey hadoop awscloud
+--- part one, who to crawl?
 
-# go fetch some tweets from them
+the system makes a simple decision of how who to collect tweets from.
+
+firstly bootstrap with yourself as a candidate
+$ ./who_to_follow_next.rb reset_to mat_kelcey
+
+next allow the system to walk your friend tree a bit to decide who else to the
+crawl tweets of. one step is taking the candidate who has been seen as a friend
+the most, add them to crawl queue, and add their friends to the list of candidates.
+$ ./who_to_follow_next.rb step 3
+
+--- part two, crawling some tweets
+
+the crawling queue should have been set up by the ./who_to_follow_next.rb steps above,
+
+if you want to add some people explicitly, eg hadoop and awscloud, you can run
+$ ./add_users_to_follow.rb hadoop awscloud
+
+running ./add_users_to_follow.rb by itself has the cryptic side effect of showing you the 
+crawl queue
+$ ./add_users_to_follow.rb
+
+a similiar script can be used to remove people you are sick of seeing tweets from
+(though really you'd be better off leaving them in for training data of what you DONT want to see!)
+$ ./remove_users_to_follow.rb PerezHilton britneyspears
+
+once your happy with who you will crawl, then do some crawling
+this step fetches new tweets for everyone in the crawl queue
 $ ./fetch_new_tweets.rb
 
-# prep some training data by giving a thumbs up and thumbs down
+--- part three: give some ratings
+
+# prep some training data by giving a thumbs up and thumbs down to unread tweets
 $ ./read_tweets.rb
 
-for now it's 
+you'll be presented with the latest (upto) 5 tweets
+give a single string that denotes what you think about each tweet
+
+for now the commands are...
 u: thumbs up
 n: neutral
 d: thumbs down
 x: exit
 
+eg 'uuudn' means you liked the first 3, didn't like the 4th and were neutral on the 5th
+
+(i know it's a crap interface but it'll do for now)
+
 TODOs semi prioritised...
-- examine list of existing users to see who they follow, for the most frequently followed ones add them to the crawl list
-- decide on a feature breakdown; 1 feature per token, if_reply, has_link, 
+- use since_id in ./fetch_new_tweets.rb to avoid getting same tweets again and again
+- make crawl queue smarter, just round robin at the moment...
+- add something to read_tweets.rb that dereferences bitly links
+- decide on a feature breakdown; 1 feature per token, if_reply, has_link, has_at_references, num terms
 - hook up something dead simple for classification; even word occurences to start with
 - hook up semi supervised version
 - replace dead simple classifier with redis backed multinomial bayes
