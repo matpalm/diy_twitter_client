@@ -2,15 +2,8 @@ require 'rubygems'
 require 'twitter'
 require 'mongo'
 require 'redis'
-
-raise "not configured! need env vars! CONSUMER_KEY CONSUMER_SECRET OAUTH_TOKEN OAUTH_TOKEN_SECRET" unless ENV['CONSUMER_KEY']
-
-Twitter.configure do |config|
-  config.consumer_key = ENV['CONSUMER_KEY']
-  config.consumer_secret = ENV['CONSUMER_SECRET']
-  config.oauth_token = ENV['OAUTH_TOKEN']
-  config.oauth_token_secret = ENV['OAUTH_TOKEN_SECRET']
-end
+require 'redis_dbs'
+require 'twitter_auth'
 
 class Tweets
 
@@ -22,12 +15,17 @@ class Tweets
     @mongo = db['tweets']
 
     @redis = Redis.new
+    @redis.select TWEET_DB
+  end
+  
+  def client
+    @twitter
   end
   
   def fetch_latest_for opts
     tweets = get_tweets opts
     new_tweets = check_and_store_if_new tweets
-    puts "fetched #{tweets.size} tweets (of which #{new_tweets.size} were new ones), mongo now has #{@mongo.size} unique tweets..."
+    puts "num_fetched=#{tweets.size} num_new=#{new_tweets.size} num_total=#{@mongo.size}"
     new_tweets
   end
 
@@ -35,9 +33,9 @@ class Tweets
     @mongo.find({ :read => false }).limit(n).sort(['id','descending'])
   end
 
-#  def username_for_uid uid
-#    @redis
-#  end
+  def save tweet
+    @mongo.save tweet
+  end
 
   def stats 
     # todo use group by, too lazy...
@@ -52,7 +50,7 @@ class Tweets
   def get_tweets opts
     raise "need :uid in opts" unless opts[:uid]
     uid = opts.delete :uid
-    opts.merge!({ :trim_user => true, :count => 10 })
+    opts.merge!({ :include_entities=>true, :count => 10 })
     tweets = @twitter.user_timeline(uid,  opts)
     tweets.map(&:to_hash)
   end

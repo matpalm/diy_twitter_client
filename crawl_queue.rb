@@ -4,8 +4,6 @@ require 'redis_dbs'
 
 class CrawlQueue
 
-  Q = 'crawl_queue'
-
   def initialize reset=false
     @r = Redis.new
     @r.select CRAWL_QUEUE_DB

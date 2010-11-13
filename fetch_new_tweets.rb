@@ -6,13 +6,7 @@ require 'tweets'
 @twitter = Tweets.new
 
 # seed if required
-if ! @crawl_queue.contains? 'mat_kelcey'
-  puts "empty? bootstrapping..."
-  %w(mat_kelcey).each do |u| 
-    @crawl_queue.push(u) 
-  end
-  @crawl_queue.dump_queue
-end
+# %w(dfgdjgdfg).each { |u| @crawl_queue.push(u) }
 
 def fetch_next
   # peek next
@@ -37,3 +31,4 @@ while last_uid_processed != first_uid_processed
 end
 
 puts @twitter.stats.inspect
+puts "remaining_hits = #{@twitter.client.rate_limit_status['remaining_hits']}"
