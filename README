@@ -1,5 +1,7 @@
 smart twitter client inspired by @hmason's twitter client https://github.com/hmason/tc
 
+goal is to hook it into a semi supervised learning framework i poked around with before http://matpalm.com/semi_supervised_naive_bayes/
+
 only a few hrs old so expect some SERIOUS WIPness!
 
 -- requires
