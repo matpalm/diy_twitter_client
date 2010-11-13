@@ -2,6 +2,7 @@ smart twitter client inspired by @hmason's twitter client https://github.com/hma
 
 SERIOUS WIP
 
+$ ./start_mongod_and_redis.sh
 $ source rc.sh
 $ ./main.rb
 
@@ -13,3 +14,6 @@ https://github.com/jnunemaker/twitter/blob/master/lib/twitter/client/timeline.rb
 mongo db ruby api
 http://api.mongodb.org/ruby/1.1.2/index.html
 
+shit i keep forgetting...
+
+db['tweets'].find({ :read => { "$exists" => false }}).count

@@ -23,9 +23,9 @@ class Tweets
   
   def fetch_latest_for opts
     tweets = get_tweets opts
-    store tweets
-    puts "mongo now has #{@mongo.size} unique tweets..."
-    tweets
+    new_tweets = check_and_store_if_new tweets
+    puts "fetched #{tweets.size} tweets (of which #{new_tweets.size} were new ones), mongo now has #{@mongo.size} unique tweets..."
+    new_tweets
   end
 
   private
@@ -33,7 +33,7 @@ class Tweets
   def get_tweets opts
     raise "need :uid in opts" unless opts[:uid]
     uid = opts.delete :uid
-    opts.merge!({ :trim_user => true, :count => 5 })
+    opts.merge!({ :trim_user => true, :count => 10 })
     tweets = @twitter.user_timeline(uid,  opts)
     tweets.map(&:to_hash)
   end
@@ -42,12 +42,13 @@ class Tweets
     @mongo.find({:id => id}).count != 0
   end
 
-  def store tweets
-    tweets.each do |t| 
-      next if have_tweet? t['id']
+  def check_and_store_if_new tweets    
+    unseen_tweets = tweets.select { |t| ! have_tweet? t['id'] }
+    unseen_tweets.each do |t|
       t['read'] = false
       @mongo.insert(t) 
     end
+    unseen_tweets
   end
 
 end
