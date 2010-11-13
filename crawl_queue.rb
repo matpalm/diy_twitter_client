@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'redis'
+require 'redis_dbs'
 
 class CrawlQueue
 
@@ -7,6 +8,7 @@ class CrawlQueue
 
   def initialize reset=false
     @r = Redis.new
+    @r.select CRAWL_QUEUE_DB
     clear if reset
   end
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require 'crawl_queue'
-require 'dist_hash'
 require 'tweets'
 
 @crawl_queue = CrawlQueue.new 
@@ -37,3 +36,4 @@ while last_uid_processed != first_uid_processed
   last_uid_processed = @crawl_queue.peek
 end
 
+puts @twitter.stats.inspect

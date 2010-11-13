@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'twitter'
 require 'mongo'
+require 'redis'
 
 raise "not configured! need env vars! CONSUMER_KEY CONSUMER_SECRET OAUTH_TOKEN OAUTH_TOKEN_SECRET" unless ENV['CONSUMER_KEY']
 
@@ -19,6 +20,8 @@ class Tweets
     mongo = Mongo::Connection.new
     db = mongo.db 'tweets'
     @mongo = db['tweets']
+
+    @redis = Redis.new
   end
   
   def fetch_latest_for opts
@@ -26,6 +29,22 @@ class Tweets
     new_tweets = check_and_store_if_new tweets
     puts "fetched #{tweets.size} tweets (of which #{new_tweets.size} were new ones), mongo now has #{@mongo.size} unique tweets..."
     new_tweets
+  end
+
+  def get_latest_unread n=10
+    @mongo.find({ :read => false }).limit(n).sort(['id','descending'])
+  end
+
+#  def username_for_uid uid
+#    @redis
+#  end
+
+  def stats 
+    # todo use group by, too lazy...
+    {
+      :num_unread => @mongo.find({ :read => false }).count,
+      :num_read   => @mongo.find({ :read => true }).count,
+    }
   end
 
   private
