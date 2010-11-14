@@ -84,8 +84,8 @@ class Tweets
   end
 
   def get_tweets_for uid
-    opts = { :include_entities=>true, :count => 10 }
-    tweets = @twitter.user_timeline(uid, opts)
+    opts = { :include_entities=>true, :count => 20 }
+    tweets = @twitter.user_timeline(uid, opts) rescue []
     tweets.map(&:to_hash)
   end
 

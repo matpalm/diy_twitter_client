@@ -4,17 +4,14 @@ require 'redis_dbs'
 
 class CrawlQueue
 
-  def initialize reset=false
+  def initialize 
     @r = Redis.new
     @r.select CRAWL_QUEUE_DB
-    clear if reset
   end
 
-=begin too dangerous!
-  def clear
-    @r.zremrangebyrank CRAWL_QUEUE, 0, queue_size
+  def reset
+    @r.flushdb
   end
-=end
 
   def contains? screen_name
     ! @r.zrank(CRAWL_QUEUE, screen_name).nil?
@@ -40,10 +37,11 @@ class CrawlQueue
     @r.zcard CRAWL_QUEUE
   end
 
-  def dump_queue
+  def dump
+    puts "CrawlQueue.dump"
     screen_names = @r.zrange CRAWL_QUEUE, 0, queue_size
     scores = screen_names.map { |screen_name| @r.zscore(CRAWL_QUEUE,screen_name) }
-    screen_names.zip(scores).each { |us| puts us.inspect }
+    puts screen_names.zip(scores).inspect
   end
 
 end

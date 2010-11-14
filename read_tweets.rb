@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'tweets'
+require 'string_exts'
 
 client = Tweets.new
 
@@ -14,7 +15,8 @@ while true do
   tweets.each_with_index do |t, idx|
     id, text  = %w(id text).map{|k| t[k]}
     name = "#{t['user']['name']} (#{t['user']['screen_name']})"
-    printf "%2d - %-30s - %-150s\n", idx, name, text
+#    printf "%2d - %-30s - %-150s\n", idx, name, text
+    printf "%2d - %-150s\n", idx, text.duplicate_whitespace_removed
   end
 
   idx = 0

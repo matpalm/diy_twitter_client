@@ -27,28 +27,23 @@ start mongo and redis
 
 the system makes a simple decision of how who to collect tweets from.
 
-firstly bootstrap with yourself as a candidate
-> $ ./who_to_follow_next.rb reset_to mat_kelcey
+firstly reset the follow/crawl queues with
+(note: this doesn't clear any cached tweets / user info / training data
+> $ ./who_to_follow_next.rb reset
 
-next allow the system to walk your friend tree a bit to decide who else to the
+add some people to look at the tweets of, make sure you add people you'd like as well as people you wouldn't like
+> $ ./who_to_follow_next.rb add positive hadoop peteskomoroch mrflip
+> $ ./who_to_follow_next.rb add negative PerezHilton britneyspears
+
+walk the twitter friend graph a bit to decide who else to the
 crawl tweets of. one step is taking the candidate who has been seen as a friend
 the most, add them to crawl queue, and add their friends to the list of candidates.
+stepping once takes the most/least friended of the positive/negative set and adds them to the crawl (ie 4 new users to crawl)
 > $ ./who_to_follow_next.rb step 3
 
 ### part two, crawling some tweets
 
 the crawling queue should have been set up by the ./who_to_follow_next.rb steps above,
-
-if you want to add some people explicitly, eg hadoop and awscloud, you can run
-> $ ./add_users_to_follow.rb hadoop awscloud
-
-running ./add_users_to_follow.rb by itself has the cryptic side effect of showing you the 
-crawl queue
-> $ ./add_users_to_follow.rb
-
-a similiar script can be used to remove people you are sick of seeing tweets from
-(though really you'd be better off leaving them in for training data of what you DONT want to see!)
-> $ ./remove_users_to_follow.rb PerezHilton britneyspears
 
 once your happy with who you will crawl, then do some crawling
 this step fetches new tweets for everyone in the crawl queue
@@ -61,6 +56,7 @@ prep some training data by giving a thumbs up and thumbs down to unread tweets
 
 you'll be presented with the latest (upto) 5 tweets
 give a single string that denotes what you think about each tweet
+no username is given to ensure your opinion is not swayed :)
 
 for now the commands are...
 - u: thumbs up
@@ -77,9 +73,11 @@ eg 'uuudn' means you liked the first 3, didn't like the 4th and were neutral on 
 this is the next thing to do!
 
 ## TODOs semi prioritised...
+- make crawler not do a loop but instead stop when it gets to one that has time > process start time, can then run 2+ at same time (as long as pop next is atomic)
 - hook up something dead simple for classification; even word occurences to start with
 - hook up semi supervised version
 - work out best way to hook the classified as to-read ones higher into the ./read_tweets queue
+- expire friends list lookup, after a day/week/whatever should refetch
 - work out how to have the author of highly rated tweets have their friends more likely to be added to the crawl 
 - use since_id in ./fetch_new_tweets.rb to avoid getting same tweets again and again
 - make crawl queue smarter, just round robin at the moment...
