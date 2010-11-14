@@ -33,6 +33,7 @@ firstly reset the follow/crawl queues with
 
 add some people to look at the tweets of, make sure you add people you'd like as well as people you wouldn't like
 > $ ./who_to_follow_next.rb add positive hadoop peteskomoroch mrflip
+>
 > $ ./who_to_follow_next.rb add negative PerezHilton britneyspears
 
 walk the twitter friend graph a bit to decide who else to the
