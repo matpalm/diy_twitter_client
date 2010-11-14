@@ -1,8 +1,21 @@
 #!/usr/bin/env ruby
 require 'tweets'
 require 'string_exts'
+require 'dereference_url_shorteners'
 
+@url_utils = DereferenceUrlShorteners.new
 client = Tweets.new
+
+def text_with_links_replaced_by_the_domains_they_point_at tweet
+  text = tweet['text']
+  tweet["entities"]["urls"].reverse.each do |url_info|
+    url = url_info['url']
+    target = @url_utils.final_target_of url
+    target_domain = @url_utils.domain_of(target)
+    text.sub!(url, "[#{target_domain}]")
+  end
+  text
+end
 
 while true do
   tweets = client.get_latest_unread 5
@@ -12,11 +25,11 @@ while true do
     exit 0
   end
 
-  tweets.each_with_index do |t, idx|
-    id, text  = %w(id text).map{|k| t[k]}
-    name = "#{t['user']['name']} (#{t['user']['screen_name']})"
-#    printf "%2d - %-30s - %-150s\n", idx, name, text
-    printf "%2d - %-150s\n", idx, text.duplicate_whitespace_removed
+  tweets.each_with_index do |tweet, idx|
+    id = tweet['id']
+    text = text_with_links_replaced_by_the_domains_they_point_at tweet
+    text = text.duplicate_whitespace_removed
+    printf "%2d - %-150s\n", idx, text
   end
 
   idx = 0

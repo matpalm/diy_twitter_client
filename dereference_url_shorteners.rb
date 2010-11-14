@@ -6,7 +6,7 @@ require 'curb'
 
 class DereferenceUrlShorteners
 
-  SHORTENERS = %(bit.ly goo.gl t.co j.mp is.gd su.pr slidesha.re qr.ae emc.im)
+  SHORTENERS = %(bit.ly goo.gl t.co j.mp is.gd su.pr slidesha.re qr.ae emc.im read.bi)
   SHORT_TO_LONG = 'short_to_long'
 
   def initialize
@@ -14,7 +14,7 @@ class DereferenceUrlShorteners
     @r.select DEREFERENCE_URL_SHORTENERS
   end
 
-  def follow_shortening_redirects url 
+  def final_target_of url 
     return nil if url.nil? # probably a redirect to 404
     return url unless SHORTENERS.include? domain_of(url)
    
@@ -22,7 +22,7 @@ class DereferenceUrlShorteners
     return target if target
 
     target = target_of_redirect(url)
-    target = follow_shortening_redirects target
+    target = final_target_of target
     cache_redirect url, target
     target
 
@@ -61,7 +61,7 @@ end
 dus = DereferenceUrlShorteners.new
 STDIN.each do |url|
   url.chomp!
-  target = dus.follow_shortening_redirects(url)
+  target = dus.final_target_of(url)
   domain = dus.domain_of target
   if url==target
     puts "untouched domain [#{domain}] url=[#{url}]"
