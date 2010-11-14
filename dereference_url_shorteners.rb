@@ -4,7 +4,7 @@ require 'redis'
 require 'redis_dbs'
 require 'curb'
 
-class DeferenceUrlShorteners
+class DereferenceUrlShorteners
 
   SHORTENERS = %(bit.ly goo.gl t.co j.mp is.gd su.pr slidesha.re qr.ae emc.im)
   SHORT_TO_LONG = 'short_to_long'
@@ -58,7 +58,7 @@ class DeferenceUrlShorteners
 end
 
 =begin
-dus = DeferenceUrlShorteners.new
+dus = DereferenceUrlShorteners.new
 STDIN.each do |url|
   url.chomp!
   target = dus.follow_shortening_redirects(url)
