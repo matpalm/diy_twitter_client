@@ -12,13 +12,14 @@ only a day old so expect some SERIOUS WIPness!
 
 - redis; for the twitter crawling which for now is just tweets
 - mongodb; for storing raw tweets augmented with rating info
-- twitter gem; (gem install twitter)  https://github.com/jnunemaker/twitter
-- highline gem
+- gem install twitter ; primarily as an easier way to get around the pain that is oauth
+- gem install highline ; for superuber awesome cli!
 
 i specifically DIDNT want to use the userstreaming timeline, find it more interesting
 to deal with the raw tweets per person (particularly to pick up conversation stuff)
 
 edit rc.eg.sh and add oauth creds for twitter, this need to be sourced into env for doing the crawl
+very clumsy, best of luck working out what the hell to put in here (be grateful twitter doesnt expire app tokens!)
 > $ source rc.sh
 
 start mongo and redis
@@ -29,25 +30,24 @@ start mongo and redis
 the system makes a simple decision of how who to collect tweets from.
 
 firstly reset the follow/crawl queues with
-(note: this doesn't clear any cached tweets / user info / training data
 > $ ./who_to_follow_next.rb reset
+(note: this doesn't clear any cached tweets / user info / training data
 
 add some people to look at the tweets of, make sure you add people you'd like as well as people you wouldn't like
 > $ ./who_to_follow_next.rb add positive hadoop peteskomoroch mrflip
 >
 > $ ./who_to_follow_next.rb add negative PerezHilton britneyspears
 
-walk the twitter friend graph a bit to decide who else to the
-crawl tweets of. one step is taking the candidate who has been seen as a friend
-the most, add them to crawl queue, and add their friends to the list of candidates.
-stepping once takes the most/least friended of the positive/negative set and adds them to the crawl (ie 4 new users to crawl)
+walk the twitter friend graph a bit to decide who else to crawl tweets of. 
+a single step takes the most/least friended of the positive/negative set and adds them to the crawl (ie 4 new users to crawl)
+(needs a better explanation, this makes no sense and i wrote the code about an hour ago... just run it, it's awesome)
 > $ ./who_to_follow_next.rb step 3
 
 ### part two, crawling some tweets
 
 the crawling queue should have been set up by the ./who_to_follow_next.rb steps above,
 
-once your happy with who you will crawl, then do some crawling
+once your happy with who you will crawl, then do some crawling!
 this step fetches new tweets for everyone in the crawl queue
 > $ ./fetch_new_tweets.rb
 
@@ -56,19 +56,14 @@ this step fetches new tweets for everyone in the crawl queue
 prep some training data by giving a thumbs up and thumbs down to unread tweets
 > $ ./read_tweets.rb
 
-you'll be presented with the latest (upto) 5 tweets
-give a single string that denotes what you think about each tweet
-no username is given to ensure your opinion is not swayed :)
+you'll be presented with the latest unrated tweet
+no username is given to ensure your opinion is not swayed :) 
 
 for now the commands are...
-- u: thumbs up
-- n: neutral
-- d: thumbs down
+- u: give thumbs up; this tweet is worth reading
+- n: you're neutral about this tweet
+- d: give thumbs down; this tweet is a waste of time
 - x: exit
-
-eg 'uuudn' means you liked the first 3, didn't like the 4th and were neutral on the 5th
-
-(i know it's a crap interface but it'll do for now)
 
 ### part four: the actual learning
 
