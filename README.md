@@ -13,6 +13,7 @@ only a day old so expect some SERIOUS WIPness!
 - redis; for the twitter crawling which for now is just tweets
 - mongodb; for storing raw tweets augmented with rating info
 - twitter gem; (gem install twitter)  https://github.com/jnunemaker/twitter
+- highline gem
 
 i specifically DIDNT want to use the userstreaming timeline, find it more interesting
 to deal with the raw tweets per person (particularly to pick up conversation stuff)
@@ -82,7 +83,6 @@ this is the next thing to do!
 - work out how to have the author of highly rated tweets have their friends more likely to be added to the crawl 
 - use since_id in ./fetch_new_tweets.rb to avoid getting same tweets again and again
 - make crawl queue smarter, just round robin at the moment...
-- add something to read_tweets.rb that dereferences bitly links
 - decide on a feature breakdown; 1 feature per token, if_reply, has_link, has_at_references, num terms
 - replace dead simple classifier with redis backed multinomial bayes
 

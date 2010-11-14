@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 require 'tweets'
-require 'string_exts'
+require 'core_exts'
 require 'dereference_url_shorteners'
+
+require 'highline/system_extensions'
+include HighLine::SystemExtensions
 
 @url_utils = DereferenceUrlShorteners.new
 client = Tweets.new
@@ -17,44 +20,37 @@ def text_with_links_replaced_by_the_domains_they_point_at tweet
   text
 end
 
-while true do
-  tweets = client.get_latest_unread 5
+puts "*** diy twitter client"
+puts "*** u - thumbs up, d - thumbs down, n - neutral, x - exit"
 
-  if tweets.empty?
+while true do
+  tweet = client.get_latest_unread
+
+  if tweet.nil?
     puts "no more left, go crawl some more sucka!"
     exit 0
   end
+  
+  # display tweet
+  text = text_with_links_replaced_by_the_domains_they_point_at tweet
+  text = text.duplicate_whitespace_removed
+  time = Time.parse(tweet['created_at']).pretty
+  printf "%-20s %-150s\n", time, text
 
-  tweets.each_with_index do |tweet, idx|
-    id = tweet['id']
-    text = text_with_links_replaced_by_the_domains_they_point_at tweet
-    text = text.duplicate_whitespace_removed
-    printf "%2d - %-150s\n", idx, text
+  # read command
+  cmd = get_character.chr
+  case cmd
+  when 'u'
+    client.mark_thumbs_up tweet
+  when 'd'
+    client.mark_thumbs_down tweet
+  when 'n'
+    client.mark_neutral tweet
+  when 'x'
+    exit 0
+  else 
+    STDERR.puts "don't know what [#{c}] means, sorry; expected one of [udnx]"
   end
-
-  idx = 0
-  print "> "
-  cmd = gets.chomp
-  cmd.chars.to_a.each do |c|
-    case c
-    when 'u'
-      client.mark_thumbs_up tweets[idx]
-      idx += 1
-    when 'd'
-      client.mark_thumbs_down tweets[idx]
-      idx += 1
-    when 'n'
-      client.mark_neutral tweets[idx]
-      idx += 1
-    when 'x'
-      exit 0
-    else 
-      raise "don't know what [#{c}] means, sorry; expected one of [udnx]"
-    end
-
-  end
-
-  puts client.stats.inspect
 
 end
 

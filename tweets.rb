@@ -48,8 +48,9 @@ class Tweets
     new_tweets
   end
 
-  def get_latest_unread n=10
-    @tweets.find({ :thumbs => { "$exists" => false }}).limit(n).sort(['id','descending']).to_a
+  def get_latest_unread
+    # todo, how to sort by id with a find_one query?
+    @tweets.find({ :thumbs => { "$exists" => false }}).sort(['id','descending']).limit(1).to_a.first
   end
 
   def mark_thumbs_up tweet
