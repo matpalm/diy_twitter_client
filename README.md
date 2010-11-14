@@ -31,16 +31,19 @@ the system makes a simple decision of how who to collect tweets from.
 
 firstly reset the follow/crawl queues with
 > $ ./who_to_follow_next.rb reset
+
 (note: this doesn't clear any cached tweets / user info / training data
 
-add some people to look at the tweets of, make sure you add people you'd like as well as people you wouldn't like
+add some people to look at the tweets of
 > $ ./who_to_follow_next.rb add positive hadoop peteskomoroch mrflip
->
+
+and make sure you add people you'd like as well as people you wouldn't like (for balanced training data)
 > $ ./who_to_follow_next.rb add negative PerezHilton britneyspears
 
 walk the twitter friend graph a bit to decide who else to crawl tweets of. 
 a single step takes the most/least friended of the positive/negative set and adds them to the crawl (ie 4 new users to crawl)
-(needs a better explanation, this makes no sense and i wrote the code about an hour ago... just run it, it's awesome)
+
+(this needs a better explanation, this makes no sense and i wrote the code about an hour ago... just run it, it's awesome)
 > $ ./who_to_follow_next.rb step 3
 
 ### part two, crawling some tweets
@@ -60,6 +63,7 @@ you'll be presented with the latest unrated tweet
 no username is given to ensure your opinion is not swayed :) 
 
 for now the commands are...
+
 - u: give thumbs up; this tweet is worth reading
 - n: you're neutral about this tweet
 - d: give thumbs down; this tweet is a waste of time
