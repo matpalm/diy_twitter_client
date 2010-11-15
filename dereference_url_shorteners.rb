@@ -11,7 +11,7 @@ class DereferenceUrlShorteners
 
   def initialize
     @r = Redis.new
-    @r.select DEREFERENCE_URL_SHORTENERS
+    @r.select DEREFERENCE_URL_SHORTENERS_DB
   end
 
   def final_target_of url 
