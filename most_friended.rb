@@ -7,15 +7,10 @@ require 'tweets'
 
 class MostFriended
 
-  def self.valid_db? db
-    ['positive','negative'].include? db
-  end
-
   def initialize training_set
-    raise "expected training_set of :positive or :negative" unless MostFriended.valid_db?(training_set)
     @training_set = training_set
     @r = Redis.new
-    @r.select(@training_set=='positive' ? POSITIVE_FRIENDS_DB : NEGATIVE_FRIENDS_DB)
+    @r.select @training_set
     @t = Tweets.new
     @cq = CrawlQueue.new
   end
@@ -67,6 +62,7 @@ class MostFriended
   end
 
   def add_user_with_id uid
+    return unless uid # empty set?
     screen_name = @t.user_info_for(uid)['screen_name']
     puts "adding #{screen_name}"
     # remove them from further counting

@@ -4,6 +4,8 @@ require 'mongo'
 require 'redis'
 require 'redis_dbs'
 require 'twitter_auth'
+require 'core_exts'
+require 'dereference_url_shorteners'
 
 class Tweets
 
@@ -17,6 +19,8 @@ class Tweets
 
     @redis = Redis.new
     @redis.select TWEET_DB
+
+    @url_utils = DereferenceUrlShorteners.new
   end
   
   def client
@@ -43,28 +47,37 @@ class Tweets
 
   def fetch_latest_tweets_for uid
     tweets = get_tweets_for uid
-    new_tweets = check_and_store_if_new tweets
-    puts "num_fetched=#{tweets.size} num_new=#{new_tweets.size} num_total=#{@tweets.size}"
-    new_tweets
+    new_tweets = tweets.select { |t| ! have_tweet? t['id'] }
+    new_tweets.each { |tweet| preprocess_and_store tweet }
+    puts "#num_fetched=#{tweets.size} #num_new=#{new_tweets.size} #num_total=#{@tweets.size}"
   end
 
   def get_latest_unread
     # todo, how to sort by id with a find_one query?
-    @tweets.find({ :thumbs => { "$exists" => false }}).sort(['id','descending']).limit(1).to_a.first
+    all_unread.sort(['id','descending']).limit(1).to_a.first
+  end
+
+  def all_unread
+    @tweets.find({ :thumbs => { "$exists" => false }})
   end
 
   def mark_thumbs_up tweet
     mark 'up', tweet
   end
-
   def mark_thumbs_down tweet
     mark 'down', tweet
   end
-
   def mark_neutral tweet
     mark 'neutral', tweet
   end
-  
+
+  def tweets_marked_thumbs_up
+    @tweets.find({ :thumbs => 'up'})
+  end
+  def tweets_marked_thumbs_down
+    @tweets.find({ :thumbs => 'down'})
+  end
+
   def stats 
     # todo use group by, too lazy...
     {
@@ -79,8 +92,8 @@ class Tweets
 
   private
 
-  def mark mark, tweet
-    tweet['thumbs'] = mark
+  def mark up_or_down, tweet
+    tweet['thumbs'] = up_or_down
     @tweets.save tweet
   end
 
@@ -94,12 +107,24 @@ class Tweets
     @tweets.find({:id => id}).count != 0
   end
 
-  def check_and_store_if_new tweets    
-    unseen_tweets = tweets.select { |t| ! have_tweet? t['id'] }
-    unseen_tweets.each do |t|
-      @tweets.insert(t) 
+  def preprocess_and_store tweet
+    text_with_links_replaced_by_the_domains_they_point_at tweet
+    @tweets.insert tweet
+  end
+
+  def text_with_links_replaced_by_the_domains_they_point_at tweet
+    sanitised_text = tweet['text'].clone
+
+    tweet["entities"]["urls"].reverse.each do |url_info|
+      url = url_info['url']
+      target = @url_utils.final_target_of url
+      target_domain = @url_utils.domain_of target
+      sanitised_text.sub!(url, "[#{target_domain}]")
     end
-    unseen_tweets
+
+    sanitised_text = sanitised_text.duplicate_whitespace_removed
+
+    tweet['sanitised_text'] = sanitised_text
   end
 
 end

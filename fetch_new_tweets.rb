@@ -8,13 +8,10 @@ require 'tweets'
 def fetch_next
   # peek next
   uid = @crawl_queue.peek
-  puts "next is #{uid}"
+  print "next is #{uid} "
   
   # fetch tweets for users
-  tweets = @twitter.fetch_latest_tweets_for uid
-  tweets.each do |tweet|
-    puts "#{uid}\t#{tweet['id']}\t#{tweet['text']}"  
-  end
+  @twitter.fetch_latest_tweets_for uid
 
   # readd to end
   @crawl_queue.push uid

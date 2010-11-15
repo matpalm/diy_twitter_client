@@ -6,8 +6,6 @@ a smart twitter client inspired by @hmason's [twitter client](https://github.com
 
 goal is to hook it into [a semi supervised learning framework](http://matpalm.com/semi_supervised_naive_bayes/) i poked around with before 
 
-only a day old so expect some SERIOUS WIPness!
-
 ## requirements
 
 - redis; for the twitter crawling which for now is just tweets
@@ -38,6 +36,8 @@ add some people to look at the tweets of
 > $ ./who_to_follow_next.rb add positive hadoop peteskomoroch mrflip
 
 and make sure you add people you'd like as well as people you wouldn't like (for balanced training data)
+(though after some more thought this just might not be required, is often the case that people you follow end
+up having enough training data for the negative case anyways...)
 > $ ./who_to_follow_next.rb add negative PerezHilton britneyspears
 
 walk the twitter friend graph a bit to decide who else to crawl tweets of. 
@@ -71,13 +71,18 @@ for now the commands are...
 
 ### part four: the actual learning
 
-this is the next thing to do!
+first version of a DEAD simple classifier based on word occurences is done...
+
+> $ ./word_occ.rb
+
+will check each unrated tweet and either give it [+] [-] or [ ]
 
 ## TODOs semi prioritised...
-- make crawler not do a loop but instead stop when it gets to one that has time > process start time, can then run 2+ at same time (as long as pop next is atomic)
-- hook up something dead simple for classification; even word occurences to start with
-- hook up semi supervised version
+- hook up semi supervised version or word occurences
+- convert word occurences to use redis (when required)
+- remove idea of another set of data for people you really dislike; there's enough negative training data in the people you like as it is...
 - work out best way to hook the classified as to-read ones higher into the ./read_tweets queue
+- make crawler not do a loop but instead stop when it gets to one that has time > process start time, can then run 2+ at same time (as long as pop next is atomic)
 - expire friends list lookup, after a day/week/whatever should refetch
 - work out how to have the author of highly rated tweets have their friends more likely to be added to the crawl 
 - use since_id in ./fetch_new_tweets.rb to avoid getting same tweets again and again
