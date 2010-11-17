@@ -6,7 +6,7 @@ include HighLine::SystemExtensions
 client = Tweets.new
 
 puts "*** diy twitter client"
-puts "*** u - thumbs up, d - thumbs down, n - neutral, x - exit"
+puts "*** u - thumbs up, d - thumbs down, x - exit"
 
 puts client.stats.inspect
 
@@ -30,12 +30,10 @@ while true do
     client.mark_thumbs_up tweet
   when 'd'
     client.mark_thumbs_down tweet
-  when 'n'
-    client.mark_neutral tweet
   when 'x'
     exit 0
   else 
-    STDERR.puts "don't know what [#{c}] means, sorry; expected one of [udnx]"
+    STDERR.puts "don't know what [#{c}] means, sorry; expected one of [udx]"
   end
 
 end

@@ -58,42 +58,39 @@ class Tweets
   end
 
   def all_unread
-    @tweets.find({ :thumbs => { "$exists" => false }})
+    @tweets.find({ :read_prob => { "$exists" => false }})
   end
 
   def mark_thumbs_up tweet
-    mark 'up', tweet
+    mark_read_prob 1.0, tweet
   end
+
   def mark_thumbs_down tweet
-    mark 'down', tweet
-  end
-  def mark_neutral tweet
-    mark 'neutral', tweet
+    mark_read_prob 0.0, tweet
   end
 
   def tweets_marked_thumbs_up
-    @tweets.find({ :thumbs => 'up'})
+    @tweets.find({ :read_prob => 1.0 })
   end
   def tweets_marked_thumbs_down
-    @tweets.find({ :thumbs => 'down'})
+    @tweets.find({ :read_prob => 0.0 })
   end
 
   def stats 
-    # todo use group by, too lazy...
+    # todo use group by, (or bucketing when this get to be truely continuous, too lazy...
     {
-      :thumbs => { 
-        :up        => @tweets.find({ :thumbs => 'up' }).count,
-        :neutral   => @tweets.find({ :thumbs => 'neutral' }).count,
-        :down      => @tweets.find({ :thumbs => 'down' }).count,
-        :undecided => @tweets.find({ :thumbs => { "$exists" => false }}).count
+      :read_prob => { 
+        :"1"      => @tweets.find({ :read_prob => 1.0 }).count,
+        :"0"      => @tweets.find({ :read_prob => 0.0 }).count,
+        :unknown  => @tweets.find({ :read_prob => { "$exists" => false }}).count
       }
     }
   end
 
   private
 
-  def mark up_or_down, tweet
-    tweet['thumbs'] = up_or_down
+  def mark_read_prob prob, tweet
+    tweet['read_prob'] = prob
     @tweets.save tweet
   end
 

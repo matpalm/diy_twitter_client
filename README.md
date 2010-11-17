@@ -65,7 +65,6 @@ no username is given to ensure your opinion is not swayed :)
 for now the commands are...
 
 - u: give thumbs up; this tweet is worth reading
-- n: you're neutral about this tweet
 - d: give thumbs down; this tweet is a waste of time
 - x: exit
 

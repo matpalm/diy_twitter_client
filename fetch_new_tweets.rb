@@ -25,4 +25,4 @@ while last_uid_processed != first_uid_processed
 end
 
 puts @twitter.stats.inspect
-puts "remaining_hits = #{@twitter.client.rate_limit_status['remaining_hits']}"
+#puts "remaining_hits = #{@twitter.client.rate_limit_status['remaining_hits']}"

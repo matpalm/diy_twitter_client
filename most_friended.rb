@@ -7,10 +7,9 @@ require 'tweets'
 
 class MostFriended
 
-  def initialize training_set
-    @training_set = training_set
+  def initialize 
     @r = Redis.new
-    @r.select @training_set
+    @r.select FRIENDS_DB
     @t = Tweets.new
     @cq = CrawlQueue.new
   end
@@ -20,13 +19,13 @@ class MostFriended
   end
 
   def dump
-    puts "MostFriended.dump #{@training_set}"
+    puts "MostFriended.dump"
 
     puts "following..."
     puts @r.smembers(FOLLOWING).map(&:to_i).inspect
 
-    puts "top 5 friends counts..."
-    uids = @r.zrevrange FRIENDS_COUNT, 0, 5
+    puts "top 10 friends counts..."
+    uids = @r.zrevrange FRIENDS_COUNT, 0, 10
     scores = uids.map { |uid| @r.zscore(FRIENDS_COUNT,uid).to_i }
     uids_as_ints = uids.map(&:to_i)
     puts uids_as_ints.zip(scores).inspect

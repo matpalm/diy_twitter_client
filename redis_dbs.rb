@@ -1,8 +1,8 @@
 # this is uber clumsy, but redis only allows numerical db ids (?)
 CRAWL_QUEUE_DB = 0
 TWEET_DB = 1
-POSITIVE_FRIENDS_DB = 2
-NEGATIVE_FRIENDS_DB = 3
+FRIENDS_DB = 2
+# 3 WAS NEG_FRIENDS_DB
 DEREFERENCE_URL_SHORTENERS_DB = 4
 THUMBS_DB = 5
 
