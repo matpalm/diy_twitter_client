@@ -10,8 +10,13 @@ goal is to hook it into [a semi supervised learning framework](http://matpalm.co
 
 - redis; for the twitter crawling which for now is just tweets
 - mongodb; for storing raw tweets augmented with rating info
-- gem install twitter ; primarily as an easier way to get around the pain that is oauth
+- gem install mongo bson_ext  ; mongo drivers
+- gem install redis   ; redis driver
+- gem install twitter --pre ; primarily as an easier way to get around the pain that is oauth, need at least 1.0.0
+-- ( requires libopenssl-ruby libssl-dev )
 - gem install highline ; for superuber awesome cli!
+- gem install curb     ; for url shortener unshortening ( requires libcurl3 libcurl3-gnutls libcurl4-openssl-dev )
+
 
 i specifically DIDNT want to use the userstreaming timeline, find it more interesting
 to deal with the raw tweets per person (particularly to pick up conversation stuff)
@@ -34,11 +39,6 @@ firstly reset the follow/crawl queues with
 
 add some people to look at the tweets of
 > $ ./who_to_follow_next.rb add positive hadoop peteskomoroch mrflip
-
-and make sure you add people you'd like as well as people you wouldn't like (for balanced training data)
-(though after some more thought this just might not be required, is often the case that people you follow end
-up having enough training data for the negative case anyways...)
-> $ ./who_to_follow_next.rb add negative PerezHilton britneyspears
 
 walk the twitter friend graph a bit to decide who else to crawl tweets of. 
 a single step takes the most/least friended of the positive/negative set and adds them to the crawl (ie 4 new users to crawl)
@@ -80,7 +80,6 @@ will check each unrated tweet and either give it [+] [-] or [ ]
 ## TODOs semi prioritised...
 - hook up semi supervised version or word occurences
 - convert word occurences to use redis (when required)
-- remove idea of another set of data for people you really dislike; there's enough negative training data in the people you like as it is...
 - work out best way to hook the classified as to-read ones higher into the ./read_tweets queue
 - make crawler not do a loop but instead stop when it gets to one that has time > process start time, can then run 2+ at same time (as long as pop next is atomic)
 - expire friends list lookup, after a day/week/whatever should refetch
@@ -89,6 +88,7 @@ will check each unrated tweet and either give it [+] [-] or [ ]
 - make crawl queue smarter, just round robin at the moment...
 - decide on a feature breakdown; 1 feature per token, if_reply, has_link, has_at_references, num terms
 - replace dead simple classifier with redis backed multinomial bayes
+- white/black list of people to always read/ignore tweets from 
 
 ## NOTES TO SELF
 
