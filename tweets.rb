@@ -58,7 +58,7 @@ class Tweets
   end
 
   def all_unread
-    @tweets.find({ :read_prob => { "$exists" => false }})
+    @tweets.find({ :read => { "$exists" => false }})
   end
 
   def mark_thumbs_up tweet
@@ -82,7 +82,7 @@ class Tweets
       :read_prob => { 
         :"1"      => @tweets.find({ :read_prob => 1.0 }).count,
         :"0"      => @tweets.find({ :read_prob => 0.0 }).count,
-        :unknown  => @tweets.find({ :read_prob => { "$exists" => false }}).count
+        :unknown  => @tweets.find({ :read => { "$exists" => false }}).count
       }
     }
   end
@@ -91,6 +91,7 @@ class Tweets
 
   def mark_read_prob prob, tweet
     tweet['read_prob'] = prob
+    tweet['read'] = true
     @tweets.save tweet
   end
 
