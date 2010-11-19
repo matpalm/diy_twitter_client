@@ -10,5 +10,5 @@ UID_TO_NAME = 'uid_to_name'
 CRAWL_QUEUE = 'crawl_queue'
 FOLLOWING = 'following'
 FRIENDS_COUNT = 'friends_count'
-
+SINCE_ID = 'since_id'
 

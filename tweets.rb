@@ -49,7 +49,6 @@ class Tweets
     tweets = get_tweets_for uid
     new_tweets = tweets.select { |t| ! have_tweet? t['id'] }
     new_tweets.each { |tweet| preprocess_and_store tweet }
-    puts "#num_fetched=#{tweets.size} #num_new=#{new_tweets.size} #num_total=#{@tweets.size}"
   end
 
   def get_latest_unread
@@ -106,8 +105,18 @@ class Tweets
   end
 
   def get_tweets_for uid
-    opts = { :include_entities=>true, :count => 20 }
-    tweets = @twitter.user_timeline(uid, opts) rescue []
+    opts = { :include_entities => true, :count => 20 }
+
+    since_id = @redis.hget SINCE_ID, uid
+    opts[:since_id] = since_id if since_id
+
+    tweets = @twitter.user_timeline(uid, opts) #rescue []
+
+    if tweets.size > 0
+      max_id = tweets.map{|t| t['id']}.max
+      @redis.hset SINCE_ID, uid, max_id
+    end
+
     tweets.map(&:to_hash)
   end
 

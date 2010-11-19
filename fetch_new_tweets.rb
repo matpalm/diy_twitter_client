@@ -5,10 +5,11 @@ require 'tweets'
 @crawl_queue = CrawlQueue.new 
 @twitter = Tweets.new
 
+STDOUT.sync = true
 def fetch_next
   # peek next
   uid = @crawl_queue.peek
-  print "next is #{uid} "
+  print "#{uid} "
   
   # fetch tweets for users
   @twitter.fetch_latest_tweets_for uid

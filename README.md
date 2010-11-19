@@ -77,13 +77,11 @@ first version of a DEAD simple classifier based on word occurences is done...
 will check each unrated tweet and either give it [+] [-] or [ ]
 
 ## TODOs semi prioritised...
-- hook up semi supervised version or word occurences
 - convert word occurences to use redis (when required)
 - work out best way to hook the classified as to-read ones higher into the ./read_tweets queue
 - make crawler not do a loop but instead stop when it gets to one that has time > process start time, can then run 2+ at same time (as long as pop next is atomic)
 - expire friends list lookup, after a day/week/whatever should refetch
 - work out how to have the author of highly rated tweets have their friends more likely to be added to the crawl 
-- use since_id in ./fetch_new_tweets.rb to avoid getting same tweets again and again
 - make crawl queue smarter, just round robin at the moment...
 - decide on a feature breakdown; 1 feature per token, if_reply, has_link, has_at_references, num terms
 - replace dead simple classifier with redis backed multinomial bayes
