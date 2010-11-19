@@ -57,16 +57,24 @@ class Tweets
     all_unread.sort(['id','descending']).limit(1).to_a.first
   end
 
+  def all_read
+    @tweets.find({ :read => true })
+  end
+  
   def all_unread
-    @tweets.find({ :read => { "$exists" => false }})
+    @tweets.find({ :read => false })
   end
 
   def mark_thumbs_up tweet
-    mark_read_prob 1.0, tweet
+    mark_read_prob tweet, 1.0, true
   end
 
   def mark_thumbs_down tweet
-    mark_read_prob 0.0, tweet
+    mark_read_prob tweet, 0.0, true
+  end
+
+  def set_read_prob_but_leave_unread tweet, prob
+    mark_read_prob tweet, prob, false
   end
 
   def tweets_marked_thumbs_up
@@ -82,16 +90,18 @@ class Tweets
       :read_prob => { 
         :"1"      => @tweets.find({ :read_prob => 1.0 }).count,
         :"0"      => @tweets.find({ :read_prob => 0.0 }).count,
-        :unknown  => @tweets.find({ :read => { "$exists" => false }}).count
-      }
+      },
+      :read   => all_read.count,
+      :unread => all_unread.count,
+      :total  => @tweets.find.count
     }
   end
 
   private
 
-  def mark_read_prob prob, tweet
+  def mark_read_prob tweet, prob, read
     tweet['read_prob'] = prob
-    tweet['read'] = true
+    tweet['read'] = read
     @tweets.save tweet
   end
 
@@ -107,6 +117,7 @@ class Tweets
 
   def preprocess_and_store tweet
     text_with_links_replaced_by_the_domains_they_point_at tweet
+    tweet['read'] = false
     @tweets.insert tweet
   end
 
