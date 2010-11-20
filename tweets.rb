@@ -40,7 +40,10 @@ class Tweets
     user_info = user_info_for uid
     return user_info['friends'] if user_info.has_key? 'friends'
     friends = @twitter.friend_ids(uid) rescue []
-    user_info['friends'] = friends
+    friends.each do |f|
+      STDERR.puts "wtf? #{f}" if f.to_i==0
+    end
+    user_info['friends'] = friends # TODO do some current users have wrong value, eg "[\"previous_cursor_str\", \"0\"]"
     @users.save user_info
     friends
   end
@@ -48,6 +51,7 @@ class Tweets
   def fetch_latest_tweets_for uid
     tweets = get_tweets_for uid
     new_tweets = tweets.select { |t| ! have_tweet? t['id'] }
+    print "#{new_tweets.size} "
     new_tweets.each { |tweet| preprocess_and_store tweet }
   end
 
@@ -105,7 +109,7 @@ class Tweets
   end
 
   def get_tweets_for uid
-    opts = { :include_entities => true, :count => 20 }
+    opts = { :include_entities => true, :count => 100 }
 
     since_id = @redis.hget SINCE_ID, uid
     opts[:since_id] = since_id if since_id

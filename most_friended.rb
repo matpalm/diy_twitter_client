@@ -5,6 +5,8 @@ require 'redis_dbs'
 require 'crawl_queue'
 require 'tweets'
 
+STDOUT.sync = true
+
 class MostFriended
 
   def initialize 
@@ -53,17 +55,17 @@ class MostFriended
   private
 
   def most_friended_user
-    @r.zrevrange(FRIENDS_COUNT, 0, 0).first
+    @r.zrevrange(FRIENDS_COUNT, 0, 0).first.to_i
   end
 
   def least_friended_user
-    @r.zrange(FRIENDS_COUNT, 0, 0).first
+    @r.zrange(FRIENDS_COUNT, 0, 0).first.to_i
   end
 
   def add_user_with_id uid
     return unless uid # empty set?
     screen_name = @t.user_info_for(uid)['screen_name']
-    puts "adding #{screen_name}"
+    print "#{screen_name} "
     # remove them from further counting
     @r.zrem FRIENDS_COUNT, uid
     # push to crawler queue
