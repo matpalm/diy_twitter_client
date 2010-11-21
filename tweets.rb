@@ -39,10 +39,7 @@ class Tweets
   def friends_of uid
     user_info = user_info_for uid
     return user_info['friends'] if user_info.has_key? 'friends'
-    friends = @twitter.friend_ids(uid) rescue []
-    friends.each do |f|
-      STDERR.puts "wtf? #{f}" if f.to_i==0
-    end
+    friends = @twitter.friend_ids(uid)['ids'] rescue []
     user_info['friends'] = friends # TODO do some current users have wrong value, eg "[\"previous_cursor_str\", \"0\"]"
     @users.save user_info
     friends
