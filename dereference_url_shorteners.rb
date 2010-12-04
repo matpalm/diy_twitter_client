@@ -6,7 +6,7 @@ require 'curb'
 
 class DereferenceUrlShorteners
 
-  SHORTENERS = %(bit.ly goo.gl t.co j.mp is.gd su.pr slidesha.re qr.ae emc.im read.bi)
+  SHORTENERS = %(bit.ly goo.gl t.co j.mp is.gd su.pr slidesha.re qr.ae emc.im read.bi tcrn.ch)
   SHORT_TO_LONG = 'short_to_long'
 
   def initialize
