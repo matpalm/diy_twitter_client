@@ -17,6 +17,14 @@ goal is to hook it into [a semi supervised learning framework](http://matpalm.co
 - gem install highline ; for superuber awesome cli!
 - gem install curb     ; for url shortener unshortening ( requires libcurl3 libcurl3-gnutls libcurl4-openssl-dev )
 
+there are two versions of the tokenisation;
+
+the simple one requires nothing,
+
+for complex tokenization need to install
+- python
+- mongo python driver ; https://github.com/mongodb/mongo-python-driver
+- NLTK ; http://www.nltk.org/
 
 i specifically DIDNT want to use the userstreaming timeline, find it more interesting
 to deal with the raw tweets per person (particularly to pick up conversation stuff)
@@ -54,6 +62,9 @@ once your happy with who you will crawl, then do some crawling!
 this step fetches new tweets for everyone in the crawl queue
 > $ ./fetch_new_tweets.rb
 
+then, if running the more complex form of the tokenisation, run
+> $ ./batch_tokenize.py
+
 ### part three: give some ratings
 
 prep some training data by giving a thumbs up and thumbs down to unread tweets
@@ -78,6 +89,7 @@ will check each unrated tweet and either give it [+] [-] or [ ]
 
 ## TODOs semi prioritised...
 - convert word occurences to use redis (when required)
+- determine, from model, what terms to search on; either the ones that are most related to read, least related or borderline...
 - work out best way to hook the classified as to-read ones higher into the ./read_tweets queue
 - make crawler not do a loop but instead stop when it gets to one that has time > process start time, can then run 2+ at same time (as long as pop next is atomic)
 - expire friends list lookup, after a day/week/whatever should refetch
