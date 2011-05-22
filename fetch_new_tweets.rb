@@ -9,7 +9,7 @@ STDOUT.sync = true
 def fetch_next
   # peek next
   uid = @crawl_queue.peek
-  print "#{uid} "
+  print "- #{uid} "
   
   # fetch tweets for users
   @twitter.fetch_latest_tweets_for uid

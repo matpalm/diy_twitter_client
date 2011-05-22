@@ -52,10 +52,13 @@ class Tweets
   end
 
   def fetch_latest_tweets_for uid
+    print "g"
     tweets = get_tweets_for uid
+    print "n"
     new_tweets = tweets.select { |t| ! have_tweet? t['id'] }
-    print "#{new_tweets.size} "
+    print "p"
     new_tweets.each { |tweet| preprocess_and_store tweet }
+    print " #{new_tweets.size} "
   end
 
   def get_latest_unread
@@ -132,6 +135,7 @@ class Tweets
   end
 
   def preprocess_and_store tweet
+    printf "."
     text_with_links_replaced_by_the_domains_they_point_at tweet
     tweet['read'] = false
     @tweets.insert tweet
