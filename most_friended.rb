@@ -44,6 +44,12 @@ class MostFriended
     add_user_with_id @t.user_info_for(screen_name)['id']
   end
 
+  def add_followed_by_user_with_screen_name screen_name
+    user = @t.user_info_for(screen_name)
+    friends = @t.friends_of user['id']
+    friends.each { |friend| add_user_with_id friend }
+  end
+
   def add_top_friended
     add_user_with_id most_friended_user
   end

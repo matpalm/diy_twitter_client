@@ -45,12 +45,15 @@ firstly reset the follow/crawl queues with
 
 (note: this doesn't clear any cached tweets / user info / training data
 
-add some people to look at the tweets of
-> $ ./who_to_follow_next.rb add positive hadoop peteskomoroch mrflip
+add the people you follow as a bootstrap for the crawl queue
+> $ ./who_to_follow_next.rb add_followed_by mat_kelcey
 
-walk the twitter friend graph a bit to decide who else to crawl tweets of. 
-a single step takes the most/least friended of the positive/negative set and adds them to the crawl (ie 4 new users to crawl)
+also add anyone else you want to explicity include (which may or may not include yourself)
+this can be useful for seeding with some training data for tweets you DON'T want to read...
+> $ ./who_to_follow_next.rb add mat_kelcey paris_hilton
 
+at this stage, or maybe later, you can grow the crawl queue by adding other people to the crawl queue
+a single step takes the most followed person to date and adds them to the crawl
 (this needs a better explanation, this makes no sense and i wrote the code about an hour ago... just run it, it's awesome)
 > $ ./who_to_follow_next.rb step 3
 

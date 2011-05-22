@@ -31,7 +31,7 @@ class Tweets
     mongo_lookup_key = uid.is_a?(String) ? 'screen_name' : 'id'
     user_info = @users.find_one(mongo_lookup_key => uid)
     return user_info if user_info
-    user_info = @twitter.user(uid).to_hash    
+    user_info = @twitter.user(uid).to_hash
     @users.save user_info
     user_info
   end
@@ -39,7 +39,13 @@ class Tweets
   def friends_of uid
     user_info = user_info_for uid
     return user_info['friends'] if user_info.has_key? 'friends'
-    friends = @twitter.friend_ids(uid)['ids'] rescue []
+    begin
+      friends = @twitter.friend_ids(uid)['ids']
+    rescue Exception => e
+      warn "problem getting friends for #{uid}"
+      warn e.inspect
+      friends = []
+    end
     user_info['friends'] = friends # TODO do some current users have wrong value, eg "[\"previous_cursor_str\", \"0\"]"
     @users.save user_info
     friends

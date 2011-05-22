@@ -3,10 +3,11 @@ require 'most_friended'
 
 USAGE_INFO = <<EOF
 usage:
-who_to_follow_next.rb reset                  reset follow next and crawl queue
-who_to_follow_next.rb add user1 user2 ...    add users to follow list
-who_to_follow_next.rb step <num_steps>       num_steps times take the top entry and add their friends
-who_to_follow_next.rb dump                   dump follow next queue and crawl queue  WARNING CAN GET HUGE FAST!
+who_to_follow_next.rb reset                              reset follow next and crawl queue
+who_to_follow_next.rb add user1 user2 ...                add users to follow list
+who_to_follow_next.rb add_followed_by user1 user2 ...    add users that these users follow
+who_to_follow_next.rb step <num_steps>                   num_steps times take the top entry and add their friends
+who_to_follow_next.rb dump                               dump follow next queue and crawl queue  WARNING CAN GET HUGE FAST!
 EOF
 
 most_friended = MostFriended.new 
@@ -20,6 +21,10 @@ when 'reset'
 when 'add'
   ARGV.shift # add cmd
   ARGV.each { |uid| most_friended.add_user_with_screen_name uid }
+
+when 'add_followed_by'
+  ARGV.shift # add cmd
+  ARGV.each { |uid| most_friended.add_followed_by_user_with_screen_name uid }
 
 when 'step'
   num_steps = ARGV[1].to_i

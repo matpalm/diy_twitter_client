@@ -14,6 +14,12 @@ require 'pp'
 
 mongo = Mongo::Connection.new
 db = mongo.db 'tweets'
-@mongo = db['tweets']
+@tweets = db['tweets']
+@users = db['users']
+puts "#tweets #{@tweets.find.count} #users #{@users.find.count}"
 
 @redis = Redis.new
+
+require 'tweets'
+@t = Tweets.new
+pp @t.stats
