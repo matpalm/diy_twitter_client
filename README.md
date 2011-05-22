@@ -8,8 +8,8 @@ goal is to hook it into [a semi supervised learning framework](http://matpalm.co
 
 ## requirements
 
-- redis; for the twitter crawling which for now is just tweets
-- mongodb; for storing raw tweets augmented with rating info
+- sudo apt-get install redis-server; for the twitter crawling which for now is just tweets
+- sudo apt-get install mongodb; for storing raw tweets augmented with rating info
 - gem install mongo bson_ext  ; mongo drivers
 - gem install redis   ; redis driver
 - gem install twitter --pre ; primarily as an easier way to get around the pain that is oauth, need at least 1.0.0
