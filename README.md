@@ -17,8 +17,13 @@ pipeline
 stage 1) 
 
 process:
+
  fetch: twitter api -> mongodb (ruby, existing)
+  ./fetch_new_tweets.rb
+
  preprocess: mongodb raw -> processing: url derefs; NLTK split
+  ./batch_tokenize.py
+ 
  learn: 
   train with labelled data
    ? do we want to label just 0 & 1 or a range?
@@ -61,6 +66,7 @@ read:
   
 to install
 - mongo db driver for python
+ sudo easy_install pymongo
  https://github.com/mongodb/mongo-python-driver
 
 i specifically DIDNT want to use the userstreaming timeline, find it more interesting
@@ -103,6 +109,9 @@ the crawling queue should have been set up by the ./who_to_follow_next.rb steps 
 once your happy with who you will crawl, then do some crawling!
 this step fetches new tweets for everyone in the crawl queue
 > $ ./fetch_new_tweets.rb
+
+ - grabs latest tweets
+ - dereferences urls
 
 ## random notes to be slotted in above
 

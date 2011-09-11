@@ -102,7 +102,11 @@ class Tweets
       },
       :read   => all_read.count,
       :unread => all_unread.count,
-      :total  => @tweets.find.count
+      :total  => @tweets.find.count,
+      :state => {
+        :fetched_from_twitter => @tweets.find({:state => 'fetched_from_twitter'}).count,
+        :tokenized_text => @tweets.find({:state => 'tokenized_text'}).count,
+      },
     }
   end
 
@@ -143,17 +147,24 @@ class Tweets
 
   def text_with_links_replaced_by_the_domains_they_point_at tweet
     sanitised_text = tweet['text'].clone
+    text_sans_url = tweet['text'].clone
+    urls = Set.new
 
     tweet["entities"]["urls"].reverse.each do |url_info|
       url = url_info['url']
       target = @url_utils.final_target_of url
       target_domain = @url_utils.domain_of target
       sanitised_text.gsub!(url, "[#{target_domain}]")
+      text_sans_url.gsub!(url, ' ')
+      urls << target_domain
     end
 
-    sanitised_text = sanitised_text.duplicate_whitespace_removed
-
-    tweet['sanitised_text'] = sanitised_text
+    tweet['sanitised_text'] = sanitised_text.duplicate_whitespace_removed
+    tweet['text_features'] = { 
+      'text_sans_url' => text_sans_url.duplicate_whitespace_removed, 
+      'urls' => urls.to_a
+    }
+    tweet['state'] = 'fetched_from_twitter'
   end
 
 end
