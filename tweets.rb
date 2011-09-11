@@ -148,7 +148,7 @@ class Tweets
       url = url_info['url']
       target = @url_utils.final_target_of url
       target_domain = @url_utils.domain_of target
-      sanitised_text.sub!(url, "[#{target_domain}]")
+      sanitised_text.gsub!(url, "[#{target_domain}]")
     end
 
     sanitised_text = sanitised_text.duplicate_whitespace_removed

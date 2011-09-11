@@ -2,32 +2,71 @@
 
 ## intro
 
-a smart twitter client inspired by @hmason's [twitter client](https://github.com/hmason/tc)
+a smart twitter client that learns what i like to read
 
-goal is to hook it into [a semi supervised learning framework](http://matpalm.com/semi_supervised_naive_bayes/) i poked around with before 
+goals
+- learn more python & vowpal wabbit
+- read more cool tweets
+
+inspired by @hmason's [twitter client](https://github.com/hmason/tc)
+
+## components
+
+pipeline
+
+stage 1) 
+
+process:
+ fetch: twitter api -> mongodb (ruby, existing)
+ preprocess: mongodb raw -> processing: url derefs; NLTK split
+ learn: 
+  train with labelled data
+   ? do we want to label just 0 & 1 or a range?
+   what features to use?
+   what cross features to do?
+  set predicted label for unlabelled example
+   ? might want to use raw values (ie those _not_ clipped to 0->1)
+ 
+read:
+ cli:
+  show unlabelled tweets; order by predicted label; then time
+
+ tweet in mongodb
+  { 
+   _twitter stuff_
+   :dtc => {
+    :predicted_label => [0.0, 1.0] # set if had been through prediction; if raw then -inf -> inf
+    :actual_label => [0, 1]        # set if has been read   
+   }
+  }
+
 
 ## requirements
 
-- sudo apt-get install redis-server; for the twitter crawling which for now is just tweets
-- sudo apt-get install mongodb; for storing raw tweets augmented with rating info
-- gem install mongo bson_ext  ; mongo drivers
-- gem install redis   ; redis driver
+### deps
+
+- mongodb; for storing raw tweets augmented with rating info
+ sudo apt-get install mongodb
+- redis; for the twitter crawling which for now is just tweets
+ sudo apt-get install redis-server
+
+- gem install mongo bson_ext  ; ruby mongo drivers
+- gem install redis   ; ruby redis driver
 - gem install twitter --pre ; primarily as an easier way to get around the pain that is oauth, need at least 1.0.0
 -- ( requires libopenssl-ruby libssl-dev )
 - gem install highline ; for superuber awesome cli!
 - gem install curb     ; for url shortener unshortening ( requires libcurl3 libcurl3-gnutls libcurl4-openssl-dev )
-
-there are two versions of the tokenisation;
-
-the simple one requires nothing,
-
-for complex tokenization need to install
-- python
-- mongo python driver ; https://github.com/mongodb/mongo-python-driver
-- NLTK ; http://www.nltk.org/
+- vowpal wabbit - 6.0 (though might just be using features from 5.1+)
+- NLTK ; http://www.nltk.org/  python nl tokenisation
+  
+to install
+- mongo db driver for python
+ https://github.com/mongodb/mongo-python-driver
 
 i specifically DIDNT want to use the userstreaming timeline, find it more interesting
 to deal with the raw tweets per person (particularly to pick up conversation stuff)
+
+### setup
 
 edit rc.eg.sh and add oauth creds for twitter, this need to be sourced into env for doing the crawl
 very clumsy, best of luck working out what the hell to put in here (be grateful twitter doesnt expire app tokens!)
@@ -65,8 +104,48 @@ once your happy with who you will crawl, then do some crawling!
 this step fetches new tweets for everyone in the crawl queue
 > $ ./fetch_new_tweets.rb
 
-then, if running the more complex form of the tokenisation, run
-> $ ./batch_tokenize.py
+## random notes to be slotted in above
+
+tweet #that @looks like [this.com]
+ =>
+|text tweet like |hashtags that |mentions looks |urls this.com
+
+but want to include other namespace stuff too
+|author mat_kelcey 
+|reply (ie first mention)
+
+will do cross products of various combos
+
+#### an approach to tokenisation with entities in python
+
+(though for learning without order this is not needed)
+
+"text" => "*smile* I love it when @cloudera plugs our stuff, right @mike_schatz? http://bit.ly/dwENuP [graph algorithms with #Hadoop #MapReduce]"
+
+ "entities"=>
+  {"urls"=>"http://bit.ly/dwENuP",
+   "hashtags"=>[{"text"=>"Hadoop", "indices"=>[114, 121]},{"text"=>"MapReduce", "indices"=>[122, 132]}],
+   "user_mentions"=>["screen_name"=>"cloudera"}, "screen_name"=>"mike_schatz"}]},
+
+in python convert to 
+
+{ "_E1" => "@cloudera", "_E2" => "@mike_schatz", "_E3" => " http://bit.ly/dwENuP", "_E4" => "#Hadoop", "_E5" => "#MapReduce" } 
+"text" => "*smile* I love it when _E1 plugs our stuff, right _E2? _E3 [graph algorithms with _E4 _E5]"
+
+then split text to 
+
+tokens  [u'*', u'smile', u'*', u'I', u'love', u'it', u'when', u'_E1', u'plugs', u'our', u'stuff', u',', u'right', u'_E2', u'?']
+tokens  [u'_E3', u'[', u'graph', u'algorithms', u'with', u'_E4', u'_E5', u']']
+
+and resub back in _E?'s
+
+
+
+----------------------------------
+-- old stuff down here 
+
+i specifically DIDNT want to use the userstreaming timeline, find it more interesting
+to deal with the raw tweets per person (particularly to pick up conversation stuff)
 
 ### part three: give some ratings
 
