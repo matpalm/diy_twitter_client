@@ -2,3 +2,4 @@ redis.out
 mongodb.out
 dump.rdb
 rc.sh
+eval_working

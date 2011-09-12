@@ -108,11 +108,14 @@ the crawling queue should have been set up by the ./who_to_follow_next.rb steps 
 
 once your happy with who you will crawl, then do some crawling!
 this step fetches new tweets for everyone in the crawl queue
-> $ ./fetch_new_tweets.rb
 
+> $ ./fetch_new_tweets.rb
  - grabs latest tweets
  - dereferences urls
 
+> $ ./tokenize_text.py
+ - tokenizes text using nltk along with some other minor feature extraction
+ 
 ## random notes to be slotted in above
 
 tweet #that @looks like [this.com]
