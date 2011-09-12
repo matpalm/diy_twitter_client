@@ -124,7 +124,7 @@ class Tweets
     since_id = @redis.hget SINCE_ID, uid
     opts[:since_id] = since_id if since_id
 
-    tweets = @twitter.user_timeline(uid, opts) #rescue []
+    tweets = @twitter.user_timeline(uid, opts) rescue []
 
     if tweets.size > 0
       max_id = tweets.map{|t| t['id']}.max
