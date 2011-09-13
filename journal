@@ -1,0 +1,124 @@
+worked on extract_vw_features.py
+
+fetch_new_tweets.rb
+ - dload tweet
+ - deref urls in sanitised_text
+ - split test into { :text_features => { :text_san_urls => String, :urls => [String] } } 
+ - state = 'fetched_from_twitter'
+
+tokenize_text.py
+ - remove [:text_features][:text_san_urls] and replace it with :tokens, :urls, :user_mentions & :hashtags
+ - state = 'tokenized_text' 
+ 
+## vowpal wabbit testing
+
+### dump all articles that have been read
+
+./read_articles_to_vw.py > read.vw
+
+wc -l read.vw
+498
+
+### evaluate 
+
+./evaluate.sh
+
+runs
+./read_articles_to_vw.py > read.vw
+then 50 times runs
+ shuf read.vw | ./split_training_test.py 0.1 train.vw test.vw
+ cat train.vw | vw -f model --quiet
+ cat test.vw | vw -t -i model -p predictions --quiet
+ cat test.vw | cut -d' ' -f1 > labels.actual
+ cat predictions | cut -d' ' -f1 > labels.predicted
+ perf -ACC -files labels.actual labels.predicted -t 0.5 | awk '{print $2}'
+
+eg1 
+
+using just author + text
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.7273  0.8281  0.8531  0.8531  0.8913  0.9298 
+[1] 0.04760018
+4.5s
+
+eg2 
+
+using author + text + urls + mentions + hashtags
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.7209  0.8000  0.8382  0.8399  0.8791  0.9333 
+[1] 0.05314496
+4.6s
+
+in this case there are 7000 features, i'm guessing it's pretty sparse
+
+eg3
+
+with quadratic features.. which ones makes sense?
+
+in order of size
+author(1) < mentions(n) ~ hashtags(n) ~ urls(n) < text(N)
+
+author & mentions? yes; represents some aspect of conversation (though one sided)
+author & hashtags? yes
+author & urls? definitely; some authors have links to good/bad things
+author & text? not so sure about this one...
+
+though quadratics with author and mentions are user based so quite narrow.
+
+though hashtags aren't that much better; are they?
+
+before thinking about it too much lets try them all...
+
+-q am -q ah -q au -q at -q mh -q mu -q mt -q hu -q ht -q ut --thread_bits 2
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.7000  0.8195  0.8470  0.8537  0.8889  0.9762 
+[1] 0.0560209
+
+ups to only 20000 features; so still quite low...
+
+--- semi supervised approach
+
+iter0
+0 split up datasets
+ # make train.vw, test.vw, semi_labelled.vw.1 datasets
+
+1 train with training
+ shuf train.vw | vw -f model
+
+2 bootstrap the semi labelled dataset
+ cat semi_labelled.vw.1 | vw -t -i model -p predictions.1
+
+3 retrain with training and newly labelled
+ mkfifo just
+ cut -d' ' -f1 predictions.1 > just_predictions
+ cut -d' ' -f2- semi_labelled.1 > examples_sans_predictions
+ ../weave.py just_predictions examples_sans_predictions > semi_labelled.2
+ rm just_predictions examples_sans_predictions
+ cat training semi_labelled.2 | shuf | vw -f model # will the shuf here cause grief?
+
+4 label unlaballed
+ cat semi_labelled.2 | vw -t -i model -p predictions.2
+
+5 while labeling !changed goto 3
+ cut -d' ' -f1 predictions.1 > just_predictions.1
+ cut -d' ' -f1 predictions.2 > just_predictions.2
+ prediction_dist = distance.py prediections.[12] 
+ mv predictions.[21]
+ mv semi_labelled.[21]
+ goto 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
