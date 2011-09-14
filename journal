@@ -108,8 +108,49 @@ iter0
  mv semi_labelled.[21]
  goto 3
 
+--- log likelihood / mutual information hacking
+
+./dump_sentences.py | gzip -1 > sentences
+
+76e3 tweets         # zcat sentences.gz | cut -f1 -d' ' | uniq | wc -l
+116e3 sentences     # zcat sentences.gz | wc -l
+976e3 terms         # zcat sentences.gz | ./ngrams.rb 1 | wc -l
+50e3 dist terms     # zcat sentences.gz | ./ngrams.rb 1 | sort | uniq -c | wc -l
+
+860e3 bigrams       # zcat sentences.gz | ./ngrams.rb 2 | wc -l
+400e3 dist bigrams  # zcat sentences.gz | ./ngrams.rb 2 | sort | uniq -c | wc -l
 
 
+zcat sentences.gz | ./bigram_mutual_info.py | sort -nr | less
+
+     1  -5.21341798302 harness the
+     2  -5.27231167207 dissecting the
+     3  -5.33643681651 willing to
+     4  -5.33643681651 tends to
+     5  -5.33643681651 refuses to
+...
+ 77371  -27.9846433637 i removed
+ 77372  -27.9846433637 i laughed
+ 77373  -27.9846433637 i frequently
+ 77374  -27.9846433637 i develop
+ 77375  -27.9846433637 i dare
+ 77376  -27.9849358625 the ten
+ 77377  -27.9849358625 the json
+ 77378  -27.9849358625 the film
+ 77379  -27.9849358625 the explorer
+ 77380  -27.9849358625 the editors
+ 77381  -27.9849358625 the charts
+ 77382  -27.9849358625 the cards
+...
+ 81415  -31.5209887627 the balloon
+ 81416  -31.5209887627 the app's
+ 81417  -31.5209887627 the apprentice
+ 81418  -31.5209887627 the analogies
+ 81419  -31.5209887627 the acronym
+ 81420  -31.5209887627 the achievements
+ 81421  -31.5209887627 the 1970s
+
+some interesting examples but need more data!
 
 
 

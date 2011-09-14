@@ -1,3 +1,5 @@
+.RData
+.Rhistory
 redis.out
 mongodb.out
 dump.rdb
