@@ -2,11 +2,14 @@
 require 'irb_rc'
 require 'set'
 
-@tweets.find('state' => 'fetched_from_twitter').each do |t|
-  t['state'] = 'urls_dereferenced'
-#  @t.text_with_links_replaced_by_the_domains_they_point_at t#['state'] = 'fetched_from_twitter'
-  @tweets.save t
+@tweets.find('delete' => {'$exists' => true}).each do |t|
+ @tweets.remove t
 end
+
+#  t['state'] = 'urls_dereferenced'
+#  @t.text_with_links_replaced_by_the_domains_they_point_at t#['state'] = 'fetched_from_twitter'
+#  @tweets.save t
+#end
 
 =begin
 

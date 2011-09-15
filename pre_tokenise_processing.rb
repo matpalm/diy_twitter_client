@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'tweets'
 require 'dereference_url_shorteners'
+STDOUT.sync = true
 
 @t = Tweets.new
 @url_utils = DereferenceUrlShorteners.new
@@ -30,6 +31,7 @@ count = 0
 
   @t.db.save tweet
   count += 1
+  print "."
 end
 
 puts "processed #{count} tweets"

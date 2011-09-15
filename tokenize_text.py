@@ -5,8 +5,7 @@ from nltk.tokenize import WordPunctTokenizer, PunktWordTokenizer, PunktSentenceT
 sent_tokenizer = PunktSentenceTokenizer()
 token_tokenizer = WordPunctTokenizer()
 
-connection = pymongo.Connection("localhost", 27017)
-db = connection.tweets
+db = pymongo.Connection("localhost", 27017).tweets
 
 # nltk splits on apostrophes; 
 # eg "i don't care" => ["i","don","'","t","care"]

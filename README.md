@@ -14,27 +14,30 @@ inspired by @hmason's [twitter client](https://github.com/hmason/tc)
 
 pipeline
 
-stage 1) 
-
 get tweets:
 
+either
  fetch based on crawl: twitter api -> mongodb (ruby, existing)
   ./fetch_new_tweets.rb
 
- prep for tokenisation (dereference urls, sanitise text etc)
- (this was part of the original ruby version and could be folded into another step)
-  ./pre_tokenise_processing.rb
+or
+ fetch from sample
+ curl -u user:password https://stream.twitter.com/1/statuses/sample.json | ./load_into_mongo.py
 
- preprocess: mongodb raw -> processing: url derefs; NLTK split
-  ./tokenize_text.py
+prep for tokenisation (dereference urls, sanitise text etc)
+ (this was part of the original ruby version and could be folded into another step)
+ ./pre_tokenise_processing.rb
+
+preprocess: mongodb raw -> processing: url derefs; NLTK split
+ ./tokenize_text.py
  
- learn: 
-  train with labelled data
-   ? do we want to label just 0 & 1 or a range?
-   what features to use?
-   what cross features to do?
-  set predicted label for unlabelled example
-   ? might want to use raw values (ie those _not_ clipped to 0->1)
+learn: 
+ train with labelled data
+  ? do we want to label just 0 & 1 or a range?
+  what features to use?
+  what cross features to do?
+ set predicted label for unlabelled example
+  ? might want to use raw values (ie those _not_ clipped to 0->1)
  
 read:
  cli:
