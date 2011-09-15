@@ -2,8 +2,14 @@
 require 'irb_rc'
 require 'set'
 
+@tweets.find('state' => 'fetched_from_twitter').each do |t|
+  t['state'] = 'urls_dereferenced'
+#  @t.text_with_links_replaced_by_the_domains_they_point_at t#['state'] = 'fetched_from_twitter'
+  @tweets.save t
+end
+
 =begin
-s = Hash.new(0)
+
 @tweets.find.each do |tweet|
   if tweet['state'] == 'fetched_from_twitter'
     s[:state__fetched_from_twitter2] += 1

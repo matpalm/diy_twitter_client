@@ -5,7 +5,6 @@ require 'redis'
 require 'redis_dbs'
 require 'twitter_auth'
 require 'core_exts'
-require 'dereference_url_shorteners'
 
 class Tweets
 
@@ -20,11 +19,14 @@ class Tweets
     @redis = Redis.new
     @redis.select TWEET_DB
 
-    @url_utils = DereferenceUrlShorteners.new
   end
   
   def client
     @twitter
+  end
+
+  def db
+    @tweets
   end
 
   def user_info_for uid
@@ -57,7 +59,10 @@ class Tweets
     print "n"
     new_tweets = tweets.select { |t| ! have_tweet? t['id'] }
     print "p"
-    new_tweets.each { |tweet| preprocess_and_store tweet }
+    new_tweets.each do |tweet| 
+      print "."
+      @tweets.insert tweet
+    end
     print " #{new_tweets.size} "
   end
 
@@ -104,13 +109,14 @@ class Tweets
       :unread => all_unread.count,
       :total  => @tweets.find.count,
       :state => {
-        :fetched_from_twitter => @tweets.find({:state => 'fetched_from_twitter'}).count,
+        :nil => @tweets.find({'text_features' => { '$exists' => false }}).count, 
+        :urls_dereferenced => @tweets.find({:state => 'urls_dereferenced'}).count,
         :tokenized_text => @tweets.find({:state => 'tokenized_text'}).count,
       },
     }
   end
 
-  private
+#  private
 
   def mark_read_prob tweet, prob, read
     tweet['read_prob'] = prob
@@ -136,35 +142,6 @@ class Tweets
 
   def have_tweet? id
     @tweets.find({:id => id}).count != 0
-  end
-
-  def preprocess_and_store tweet
-    printf "."
-    text_with_links_replaced_by_the_domains_they_point_at tweet
-    tweet['read'] = false
-    @tweets.insert tweet
-  end
-
-  def text_with_links_replaced_by_the_domains_they_point_at tweet
-    sanitised_text = tweet['text'].clone
-    text_sans_url = tweet['text'].clone
-    urls = Set.new
-
-    tweet["entities"]["urls"].reverse.each do |url_info|
-      url = url_info['url']
-      target = @url_utils.final_target_of url
-      target_domain = @url_utils.domain_of target
-      sanitised_text.gsub!(url, "[#{target_domain}]")
-      text_sans_url.gsub!(url, ' ')
-      urls << target_domain
-    end
-
-    tweet['sanitised_text'] = sanitised_text.duplicate_whitespace_removed
-    tweet['text_features'] = { 
-      'text_sans_url' => text_sans_url.duplicate_whitespace_removed, 
-      'urls' => urls.to_a
-    }
-    tweet['state'] = 'fetched_from_twitter'
   end
 
 end

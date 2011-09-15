@@ -15,7 +15,6 @@ class DereferenceUrlShorteners
   end
 
   def final_target_of url 
-    print ","
     return nil if url.nil? # probably a redirect to 404
     return url unless SHORTENERS.include? domain_of(url)
    

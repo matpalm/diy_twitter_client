@@ -28,7 +28,7 @@ def recombine_apostrophes(a):
 def keep_token(token):
     return len(token)>1 or token.isalnum()
 
-unprocessed_tweets = db.tweets.find({'state':'fetched_from_twitter'})
+unprocessed_tweets = db.tweets.find({'state':'urls_dereferenced'})
 processed = 0
 for tweet in unprocessed_tweets:
     text = tweet['text_features']['text_sans_url'].lower()

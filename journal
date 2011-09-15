@@ -1,7 +1,10 @@
 worked on extract_vw_features.py
 
 fetch_new_tweets.rb
- - dload tweet
+ - dload tweets based on crawl queue
+
+pre_tokenise_processing.rb
+ - set 'read' => false
  - deref urls in sanitised_text
  - split test into { :text_features => { :text_san_urls => String, :urls => [String] } } 
  - state = 'fetched_from_twitter'

@@ -3,8 +3,8 @@ import sys
 from math import *
 from collections import *
 
-MIN_BIGRAM_SUPPORT = 1#2
-MIN_UNIGRAM_SUPPORT = 1#5
+MIN_BIGRAM_SUPPORT = 2
+MIN_UNIGRAM_SUPPORT = 5
 
 unigram_count = 0
 bigram_count = 0
@@ -47,12 +47,13 @@ for bigram in bigram_freq:
     if t1_f < MIN_UNIGRAM_SUPPORT or t2_f < MIN_UNIGRAM_SUPPORT:
         continue
 
-    p_bigram = float(bigram_f) / bigram_count
-    p_t1 = float(t1_f) / unigram_count
-    p_t2 = float(t2_f) / unigram_count
+    # ll_bigram = log(bigram_f) - log(bigram_count)
+    # ll_t1 = log(t1_f) - log(unigram_count)
+    # ll_t2 = log(t2_f) - log(unigram_count)
+    # mutual_info = exp(ll_bigram - (ll_t1 + ll_t2))
 
-    mutual_info = p_bigram / (p_t1 * p_t2)
+    mutual_info = log(bigram_f) - log(bigram_count) - log(t1_f) - log(t2_f) + 2*log(unigram_count)
 
-    print mutual_info, bigram_f, p_bigram, t1_f, p_t1, t2_f, p_t2, t1, t2
+    print mutual_info, bigram_f, t1_f, t2_f, t1, t2
 
         

@@ -16,13 +16,17 @@ pipeline
 
 stage 1) 
 
-process:
+get tweets:
 
- fetch: twitter api -> mongodb (ruby, existing)
+ fetch based on crawl: twitter api -> mongodb (ruby, existing)
   ./fetch_new_tweets.rb
 
+ prep for tokenisation (dereference urls, sanitise text etc)
+ (this was part of the original ruby version and could be folded into another step)
+  ./pre_tokenise_processing.rb
+
  preprocess: mongodb raw -> processing: url derefs; NLTK split
-  ./batch_tokenize.py
+  ./tokenize_text.py
  
  learn: 
   train with labelled data
