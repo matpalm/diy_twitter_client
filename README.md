@@ -16,20 +16,20 @@ pipeline
 
 get tweets:
 
-either
- fetch based on crawl: twitter api -> mongodb (ruby, existing)
-  ./fetch_new_tweets.rb
+either fetch based on crawl: twitter api -> mongodb (ruby, existing)
 
-or
- fetch from sample
- curl -u user:password https://stream.twitter.com/1/statuses/sample.json | ./load_into_mongo.py
+> ./fetch_new_tweets.rb
 
-prep for tokenisation (dereference urls, sanitise text etc)
- (this was part of the original ruby version and could be folded into another step)
- ./pre_tokenise_processing.rb
+or fetch from sample
+
+> curl -u user:password https://stream.twitter.com/1/statuses/sample.json | ./load_into_mongo.py
+
+prep for tokenisation (dereference urls, sanitise text etc) (this was part of the original ruby version and could be folded into another step)
+> ./pre_tokenise_processing.rb
 
 preprocess: mongodb raw -> processing: url derefs; NLTK split
- ./tokenize_text.py
+
+> ./tokenize_text.py
  
 learn: 
  train with labelled data
